@@ -4,12 +4,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\UserRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Validation\Rule;
-use Laravel\Sanctum\PersonalAccessToken;
 
 class UserController extends Controller
 {
@@ -38,5 +34,14 @@ class UserController extends Controller
         else {
             return response()->json(["message" => "Username and Password is incorrect"], 400);
         }
+    }
+
+    public function logout()
+    {
+        $user = Auth::guard('api')->user();
+        $user->tokens->each(function ($token) {
+            $token->delete();
+        });
+        return response()->json(['message' => 'Logged out successfully']);
     }
 }
